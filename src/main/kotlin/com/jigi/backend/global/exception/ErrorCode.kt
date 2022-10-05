@@ -18,4 +18,5 @@ enum class ErrorCode(
     TOKEN_EXPIRED(401, "토큰이 만료되었습니다."),
     TOKEN_NOT_VALID(401, "토큰이 유효하지 않습니다."),
     DETAIL_NOT_FIND(404, "세부 API를 찾아올 수 없습니다."),
+    FRAMEWORK_NOT_FIND(404, "프레임워크를 찾을 수 없습니다.")
 }
