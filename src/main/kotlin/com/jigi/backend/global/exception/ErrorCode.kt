@@ -16,5 +16,6 @@ enum class ErrorCode(
     PASSWORD_NOT_CORRECT(400, "패스워드가 일치하지 않습니다."),
     POSTING_NOT_EXIST(404, "해당 포스팅이 존재하지 않습니다."),
     TOKEN_EXPIRED(401, "토큰이 만료되었습니다."),
-    TOKEN_NOT_VALID(401, "토큰이 유효하지 않습니다.")
+    TOKEN_NOT_VALID(401, "토큰이 유효하지 않습니다."),
+    DETAIL_NOT_FIND(404, "세부 API를 찾아올 수 없습니다."),
 }
