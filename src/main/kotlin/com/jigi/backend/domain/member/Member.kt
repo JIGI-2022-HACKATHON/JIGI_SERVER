@@ -1,16 +1,22 @@
 package com.jigi.backend.domain.member
 
+import com.jigi.backend.domain.member.enums.Field
+import com.jigi.backend.domain.member.enums.Grade
 import javax.persistence.*
 
 @Entity
 class Member(
-    var email: String,
-    var password: String,
-    var name: String,
+    val email: String,
+    val password: String,
+    val name: String,
     @Enumerated(EnumType.STRING) @Column(name = "Role")
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "Role", joinColumns = [JoinColumn(name = "member_id")])
-    var roles: MutableList<Role>,
+    val roles: MutableList<Role>,
+    @Enumerated(EnumType.STRING)
+    val grade: Grade,
+    @Enumerated(EnumType.STRING)
+    val field: Field,
 ) {
     @Id
     @GeneratedValue
