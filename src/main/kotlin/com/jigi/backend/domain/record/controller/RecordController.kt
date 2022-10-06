@@ -26,27 +26,21 @@ class RecordController(
         return ResponseEntity.ok(SuccessResponse)
     }
 
-    @GetMapping("/main/field/{field}")
-    fun getMainByField(@PathVariable field: Field): ResponseEntity<List<TotalRecordResDto>>{
-        val totalRecordResDtoList = recordService.getTotalByField(field)
-        return ResponseEntity.ok(totalRecordResDtoList)
-    }
-
     @GetMapping("/main")
     fun getMain():ResponseEntity<List<TotalRecordResDto>>{
         val total = recordService.getTotal()
         return ResponseEntity.ok(total)
     }
 
-    @GetMapping("/main/grade/{grade}")
-    fun getMainByGrade(@PathVariable grade: Grade):ResponseEntity<List<TotalRecordResDto>>{
-        val total = recordService.getTotalByGrade(grade)
+    @GetMapping("/main/{grade}/{field}")
+    fun getMain(@PathVariable grade: Grade, @PathVariable field: Field):ResponseEntity<List<TotalRecordResDto>>{
+        val total = recordService.getTotalByGradeAndField(grade, field)
         return ResponseEntity.ok(total)
     }
 
-    @GetMapping("/all/{grade}/{month}/{field}")
-    fun getAllByField(@PathVariable grade: Grade, @PathVariable month: Int, @PathVariable field: Field):ResponseEntity<List<TotalRecordResDto>>{
-        val all = recordService.getAllByField(grade, month, field)
+    @GetMapping("/all/{year}/{month}/{field}")
+    fun getAllByField(@PathVariable year: Int, @PathVariable month: Int, @PathVariable field: Field):ResponseEntity<List<TotalRecordResDto>>{
+        val all = recordService.getAllByYearMonthField(year, month, field)
         return ResponseEntity.ok(all)
     }
 

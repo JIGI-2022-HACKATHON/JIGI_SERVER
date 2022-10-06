@@ -26,7 +26,7 @@ class MemberController (
     fun signin(@RequestBody signinDto: SigninDto): ResponseEntity<SigninResDto> =
         ResponseEntity.ok(memberService.siginin(signinDto))
 
-    @GetMapping("/my/{grade}/{month}")
-    fun getMyInfo(@PathVariable grade: Grade, @PathVariable month: Int): ResponseEntity<MyPageInfoResDto> =
-        ResponseEntity.ok(memberService.getMyPageInfo(grade, month))
+    @GetMapping("/my/{grade}")
+    fun getMyInfo(@PathVariable grade: Grade): ResponseEntity<MyPageInfoResDto> =
+        ResponseEntity.ok(memberService.getMyPageInfo(grade))
 }

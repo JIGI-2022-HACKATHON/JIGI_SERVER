@@ -36,6 +36,7 @@ class RecordService(
             writer = currentMemberUtil.getCurrentMember(),
             detail = detail,
             date = LocalDate.now(),
+            writtenGrade = currentMemberUtil.getCurrentMember().grade
         )
         contentRepository.save(content)
     }
@@ -105,13 +106,15 @@ class RecordService(
         return list
     }
 
-    fun getTotalByField(field: Field): List<TotalRecordResDto>{
+    fun getTotalByGradeAndField(grade: Grade, field: Field): List<TotalRecordResDto>{
         val contents = contentRepository.findAllByDateBetween(LocalDate.now().minusDays(7), LocalDate.now())
         val list = mutableListOf<TotalRecordResDto>()
         val detailList = mutableListOf<Detail>()
         val frameworkList = mutableListOf<Framework>()
         contents.forEach {
-            detailList.add(it.detail)
+            if(it.writer?.grade == grade){
+                detailList.add(it.detail)
+            }
         }
         detailList.distinct()
             .forEach{
@@ -148,56 +151,13 @@ class RecordService(
         return list
     }
 
-    fun getTotalByGrade(grade: Grade): List<TotalRecordResDto>{
-        val contents = contentRepository.findAllByDateBetween(LocalDate.now().minusDays(7), LocalDate.now())
-        val list = mutableListOf<TotalRecordResDto>()
-        val detailList = mutableListOf<Detail>()
-        val frameworkList = mutableListOf<Framework>()
-        contents.forEach {
-            if(it.writer?.grade == grade){
-                detailList.add(it.detail)
-            }
-        }
-        detailList.distinct()
-            .forEach{
-                frameworkList.add(it.framework)
-            }
-        frameworkList.sortBy { it.cnt }
-        frameworkList.reverse()
-        frameworkList.distinct()
-            .forEach{
-                it.details.sortBy { it.cnt }
-                it.details.reverse()
-                if(it.details.size>5){
-                    val range = it.details.size - 1
-                    for(i:Int in 5..range){
-                        it.details.removeAt(5)
-                    }
-                }
-                list.add(
-                    TotalRecordResDto(
-                        frameworkCount = it.cnt,
-                        framework = it.name,
-                        details = it.details
-                    )
-                )
-            }
-        if(list.size>3){
-            val range = list.size - 1
-            for(i:Int in 3..range){
-                list.removeAt(3)
-            }
-        }
-        return list
-    }
-
-    fun getAllByField(grade: Grade, month: Int, field: Field): List<TotalRecordResDto>{
+    fun getAllByYearMonthField(year: Int, month: Int, field: Field): List<TotalRecordResDto>{
         val contents = contentRepository.findAll()
         val list = mutableListOf<TotalRecordResDto>()
         val detailList = mutableListOf<Detail>()
         val frameworkList = mutableListOf<Framework>()
         contents.forEach {
-            if(it.writer!!.grade == grade && it.date.month.value == month){
+            if(it.date.year == year && it.date.month.value == month){
                 detailList.add(it.detail)
             }
         }
@@ -247,11 +207,11 @@ class RecordService(
         return list
     }
 
-    fun getMyRecord(grade: Grade, month: Int): List<AllRecordResDto>{
+    fun getMyRecord(grade: Grade): List<AllRecordResDto>{
         val list = mutableListOf<AllRecordResDto>()
         val contents = contentRepository.findAllByWriter(currentMemberUtil.getCurrentMember())
         contents.forEach {
-            if(it.writer!!.grade == grade && it.date.month.value == month){
+            if(it.writtenGrade == grade){
                 list.add(
                     AllRecordResDto(
                         writerId = it.writer!!.id,

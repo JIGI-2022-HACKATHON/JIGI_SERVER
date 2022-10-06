@@ -26,7 +26,7 @@ class MemberService(
     fun signup(signupDto: SignupDto): Long{
         if (memberRepository.existsByEmail(signupDto.email))
             throw MemberAlreadyExistException()
-        val member = signupDto.toEntity(passwordEncoder.encode(signupDto.email))
+        val member = signupDto.toEntity(passwordEncoder.encode(signupDto.password))
         return memberRepository.save(member).id
     }
 
@@ -34,7 +34,7 @@ class MemberService(
         if(!memberRepository.existsByEmail(signinDto.email))
             throw UserNotExistsException()
         val member = memberRepository.findByEmail(signinDto.email).orElseThrow { throw UserNotExistsException() }
-        if(passwordEncoder.matches(signinDto.password, member.password))
+        if(!passwordEncoder.matches(signinDto.password, member.password))
             throw PasswordNotCorrectException()
         val accessToken = tokenProvider.createAccessToken(member.email, member.roles)
         return SigninResDto(
@@ -42,8 +42,8 @@ class MemberService(
         )
     }
 
-    fun getMyPageInfo(grade: Grade, month: Int): MyPageInfoResDto{
-        val myRecord = recordService.getMyRecord(grade, month)
+    fun getMyPageInfo(grade: Grade): MyPageInfoResDto{
+        val myRecord = recordService.getMyRecord(grade)
         val member = currentMemberUtil.getCurrentMember()
         return MyPageInfoResDto(
             memberId = member.id,

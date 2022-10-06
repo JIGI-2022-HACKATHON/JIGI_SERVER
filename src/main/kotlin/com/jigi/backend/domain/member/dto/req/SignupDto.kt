@@ -8,7 +8,7 @@ import java.util.Collections
 import javax.validation.constraints.Pattern
 
 class SignupDto(
-    @field:Pattern(regexp = "^[a-zA-Z0-9]+@+gsm.hs.kr|dsm.hs.kr|dgsm.hs.kr|bsm.hs.kr$")
+    @field:Pattern(regexp = "^[a-zA-Z0-9]+@+(gsm.hs.kr|dsm.hs.kr|dgsw.hs.kr|bssm.hs.kr)$")
     val email: String,
     val password: String,
     val grade: Grade,
