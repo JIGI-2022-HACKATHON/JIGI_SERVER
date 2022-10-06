@@ -6,6 +6,7 @@ import com.jigi.backend.domain.record.Content
 import com.jigi.backend.domain.record.Detail
 import com.jigi.backend.domain.record.Framework
 import com.jigi.backend.domain.record.dto.req.RecordReqDto
+import com.jigi.backend.domain.record.dto.res.AllRecordResDto
 import com.jigi.backend.domain.record.dto.res.TotalRecordResDto
 import com.jigi.backend.domain.record.repository.ContentRepository
 import com.jigi.backend.domain.record.repository.DetailRepository
@@ -183,6 +184,86 @@ class RecordService(
             val range = list.size - 1
             for(i:Int in 3..range){
                 list.removeAt(3)
+            }
+        }
+        return list
+    }
+
+    fun getAllByField(grade: Grade, month: Int, field: Field): List<TotalRecordResDto>{
+        val contents = contentRepository.findAll()
+        val list = mutableListOf<TotalRecordResDto>()
+        val detailList = mutableListOf<Detail>()
+        val frameworkList = mutableListOf<Framework>()
+        contents.forEach {
+            if(it.writer!!.grade == grade && it.date.month.value == month){
+                detailList.add(it.detail)
+            }
+        }
+        detailList.distinct()
+            .forEach{
+                frameworkList.add(it.framework)
+            }
+        frameworkList.sortBy { it.cnt }
+        frameworkList.reverse()
+        frameworkList.distinct()
+            .forEach{
+                if(it.field == field){
+                    it.details.sortBy { it.cnt }
+                    it.details.reverse()
+                    list.add(
+                        TotalRecordResDto(
+                            frameworkCount = it.cnt,
+                            framework = it.name,
+                            details = it.details
+                        )
+                    )
+                }
+            }
+        return list
+    }
+
+    fun getContentByDetail(detailId: Long): List<AllRecordResDto>{
+        val detail = detailRepository.findById(detailId).orElseThrow { DetailNotFindException() }
+        val contents = detail.contents
+        val list = mutableListOf<AllRecordResDto>()
+        contents.forEach {
+            list.add(
+                AllRecordResDto(
+                    writerId = it.writer!!.id,
+                    writerName = it.writer.name,
+                    email = it.writer.email,
+                    commentId = it.id,
+                    comment = it.content,
+                    detailId = it.detail.id,
+                    detailName = it.detail.name,
+                    frameworkId = it.detail.framework.id,
+                    frameworkName = it.detail.framework.name,
+                    date = it.date,
+                )
+            )
+        }
+        return list
+    }
+
+    fun getMyRecord(grade: Grade, month: Int): List<AllRecordResDto>{
+        val list = mutableListOf<AllRecordResDto>()
+        val contents = contentRepository.findAllByWriter(currentMemberUtil.getCurrentMember())
+        contents.forEach {
+            if(it.writer!!.grade == grade && it.date.month.value == month){
+                list.add(
+                    AllRecordResDto(
+                        writerId = it.writer!!.id,
+                        writerName = it.writer.name,
+                        email = it.writer.email,
+                        commentId = it.id,
+                        comment = it.content,
+                        detailId = it.detail.id,
+                        detailName = it.detail.name,
+                        frameworkId = it.detail.framework.id,
+                        frameworkName = it.detail.framework.name,
+                        date = it.date,
+                    )
+                )
             }
         }
         return list

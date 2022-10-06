@@ -20,7 +20,6 @@ class TagController (
         @RequestParam framework: String,
         @RequestParam detail: String,
     ): ResponseEntity<SuccessResponse>{
-        println("field = ${field}")
         recordService.registerTag(field, framework, detail)
         return ResponseEntity.ok(SuccessResponse)
     }
