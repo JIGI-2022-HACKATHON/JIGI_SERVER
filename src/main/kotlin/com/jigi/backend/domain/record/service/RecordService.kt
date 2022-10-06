@@ -1,6 +1,7 @@
 package com.jigi.backend.domain.record.service
 
 import com.jigi.backend.domain.member.enums.Field
+import com.jigi.backend.domain.member.enums.Grade
 import com.jigi.backend.domain.record.Content
 import com.jigi.backend.domain.record.Detail
 import com.jigi.backend.domain.record.Framework
@@ -69,12 +70,21 @@ class RecordService(
         contents.forEach {
             detailList.add(it.detail)
         }
-        detailList.distinct()
         detailList.forEach{
             frameworkList.add(it.framework)
         }
+        frameworkList.sortBy { it.cnt }
+        frameworkList.reverse()
         frameworkList.distinct()
             .forEach{
+                it.details.sortBy { it.cnt }
+                it.details.reverse()
+                if(it.details.size>5){
+                    val range = it.details.size - 1
+                    for(i:Int in 5..range){
+                        it.details.removeAt(5)
+                    }
+                }
                 list.add(
                     TotalRecordResDto(
                         frameworkCount = it.cnt,
@@ -83,34 +93,98 @@ class RecordService(
                     )
                 )
             }
-        return list
-    }
-
-    fun getTotalByField(field: Field): List<TotalRecordResDto>{
-        val frameworkList = frameworkRepository.findAllByFieldOrderByCntDesc(field)
-        val list = mutableListOf<TotalRecordResDto>()
-        val loop = (if (frameworkList.size <= 3) frameworkList.size else 3) - 1
-        for(i : Int in 0..loop){
-            val framework = frameworkList.get(i)
-            val detailList = mutableListOf<Detail>()
-            val details = detailRepository.findAllByFrameworkOrderByCntDesc(framework)
-            val loop1 = (if (details.size <= 5) details.size else 5) - 1
-            for(i : Int in 0..loop1){
-                val detail = details.get(i)
-                detailList.add(detail)
+        if(list.size>3){
+            val range = list.size - 1
+            for(i:Int in 3..range){
+                list.removeAt(3)
             }
-            list.add(
-                TotalRecordResDto(
-                    framework = framework.name,
-                    details = detailList,
-                    frameworkCount = framework.cnt
-                )
-            )
         }
         return list
     }
 
-    fun getTotalByGrade(){
+    fun getTotalByField(field: Field): List<TotalRecordResDto>{
+        val contents = contentRepository.findAllByDateBetween(LocalDate.now().minusDays(7), LocalDate.now())
+        val list = mutableListOf<TotalRecordResDto>()
+        val detailList = mutableListOf<Detail>()
+        val frameworkList = mutableListOf<Framework>()
+        contents.forEach {
+            detailList.add(it.detail)
+        }
+        detailList.distinct()
+            .forEach{
+                frameworkList.add(it.framework)
+            }
+        frameworkList.sortBy { it.cnt }
+        frameworkList.reverse()
+        frameworkList.distinct()
+            .forEach{
+                if(it.field == field){
+                    it.details.sortBy { it.cnt }
+                    it.details.reverse()
+                    if(it.details.size>5){
+                        val range = it.details.size - 1
+                        for(i:Int in 5..range){
+                            it.details.removeAt(5)
+                        }
+                    }
+                    list.add(
+                        TotalRecordResDto(
+                            frameworkCount = it.cnt,
+                            framework = it.name,
+                            details = it.details
+                        )
+                    )
+                }
+            }
+        if(list.size>3){
+            val range = list.size - 1
+            for(i:Int in 3..range){
+                list.removeAt(3)
+            }
+        }
+        return list
+    }
 
+    fun getTotalByGrade(grade: Grade): List<TotalRecordResDto>{
+        val contents = contentRepository.findAllByDateBetween(LocalDate.now().minusDays(7), LocalDate.now())
+        val list = mutableListOf<TotalRecordResDto>()
+        val detailList = mutableListOf<Detail>()
+        val frameworkList = mutableListOf<Framework>()
+        contents.forEach {
+            if(it.writer?.grade == grade){
+                detailList.add(it.detail)
+            }
+        }
+        detailList.distinct()
+            .forEach{
+                frameworkList.add(it.framework)
+            }
+        frameworkList.sortBy { it.cnt }
+        frameworkList.reverse()
+        frameworkList.distinct()
+            .forEach{
+                it.details.sortBy { it.cnt }
+                it.details.reverse()
+                if(it.details.size>5){
+                    val range = it.details.size - 1
+                    for(i:Int in 5..range){
+                        it.details.removeAt(5)
+                    }
+                }
+                list.add(
+                    TotalRecordResDto(
+                        frameworkCount = it.cnt,
+                        framework = it.name,
+                        details = it.details
+                    )
+                )
+            }
+        if(list.size>3){
+            val range = list.size - 1
+            for(i:Int in 3..range){
+                list.removeAt(3)
+            }
+        }
+        return list
     }
 }

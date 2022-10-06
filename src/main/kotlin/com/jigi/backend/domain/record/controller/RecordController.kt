@@ -1,6 +1,7 @@
 package com.jigi.backend.domain.record.controller
 
 import com.jigi.backend.domain.member.enums.Field
+import com.jigi.backend.domain.member.enums.Grade
 import com.jigi.backend.domain.record.dto.req.RecordReqDto
 import com.jigi.backend.domain.record.dto.res.TotalRecordResDto
 import com.jigi.backend.domain.record.service.RecordService
@@ -24,9 +25,8 @@ class RecordController(
         return ResponseEntity.ok(SuccessResponse)
     }
 
-    @GetMapping("/main/{field}")
+    @GetMapping("/main/field/{field}")
     fun getMainByField(@PathVariable field: Field): ResponseEntity<List<TotalRecordResDto>>{
-        println("field = ${field}")
         val totalRecordResDtoList = recordService.getTotalByField(field)
         return ResponseEntity.ok(totalRecordResDtoList)
     }
@@ -35,5 +35,16 @@ class RecordController(
     fun getMain():ResponseEntity<List<TotalRecordResDto>>{
         val total = recordService.getTotal()
         return ResponseEntity.ok(total)
+    }
+
+    @GetMapping("/main/grade/{grade}")
+    fun getMainByGrade(@PathVariable grade: Grade):ResponseEntity<List<TotalRecordResDto>>{
+        val total = recordService.getTotalByGrade(grade)
+        return ResponseEntity.ok(total)
+    }
+
+    @GetMapping("/all/field/{field}")
+    fun getAllByField(@PathVariable field: Field){
+
     }
 }

@@ -6,6 +6,7 @@ import javax.persistence.*
 @Entity
 class Framework(
     val name:String,
+    @Enumerated(EnumType.STRING)
     val field:Field,
 ){
     @Id @GeneratedValue
