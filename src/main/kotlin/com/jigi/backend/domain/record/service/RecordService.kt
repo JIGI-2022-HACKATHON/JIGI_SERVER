@@ -7,6 +7,8 @@ import com.jigi.backend.domain.record.Detail
 import com.jigi.backend.domain.record.Framework
 import com.jigi.backend.domain.record.dto.req.RecordReqDto
 import com.jigi.backend.domain.record.dto.res.AllRecordResDto
+import com.jigi.backend.domain.record.dto.res.DetailResDto
+import com.jigi.backend.domain.record.dto.res.FrameworkResDto
 import com.jigi.backend.domain.record.dto.res.TotalRecordResDto
 import com.jigi.backend.domain.record.repository.ContentRepository
 import com.jigi.backend.domain.record.repository.DetailRepository
@@ -267,5 +269,16 @@ class RecordService(
             }
         }
         return list
+    }
+
+    fun getFrameworkByField(field: Field): List<FrameworkResDto> {
+        val frameworkList = frameworkRepository.findAllByFieldOrderByCntDesc(field)
+        return frameworkList.map { FrameworkResDto(it) }.toList()
+    }
+
+    fun getDetailByFramework(frameworkId: Long): List<DetailResDto>{
+        val framework = frameworkRepository.findById(frameworkId).orElseThrow { FrameworkNotExistsException() }
+        val detailList = detailRepository.findAllByFrameworkOrderByCntDesc(framework)
+        return detailList.map { DetailResDto(it) }.toList()
     }
 }
